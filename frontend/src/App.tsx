@@ -9,6 +9,8 @@ import Simulation from './pages/Simulation';
 import PensionCalc from './pages/PensionCalc';
 import TaxCalc from './pages/TaxCalc';
 import RealEstate from './pages/RealEstate';
+import Sync from './pages/Sync';
+import Advisor from './pages/Advisor';
 
 const navItems = [
   { to: '/', label: '대시보드' },
@@ -21,6 +23,8 @@ const navItems = [
   { to: '/pension-calc', label: '연금추정' },
   { to: '/tax', label: '세금' },
   { to: '/realestate', label: '부동산' },
+  { to: '/advisor', label: '어드바이저' },
+  { to: '/sync', label: '동기화' },
 ];
 
 export default function App() {
@@ -69,6 +73,8 @@ export default function App() {
             <Route path="/pension-calc" element={<PensionCalc />} />
             <Route path="/tax" element={<TaxCalc />} />
             <Route path="/realestate" element={<RealEstate />} />
+            <Route path="/advisor" element={<Advisor />} />
+            <Route path="/sync" element={<Sync />} />
           </Routes>
         </main>
       </div>
