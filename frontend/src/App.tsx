@@ -5,6 +5,10 @@ import Debts from './pages/Debts';
 import CashFlow from './pages/CashFlow';
 import Pensions from './pages/Pensions';
 import Goals from './pages/Goals';
+import Simulation from './pages/Simulation';
+import PensionCalc from './pages/PensionCalc';
+import TaxCalc from './pages/TaxCalc';
+import RealEstate from './pages/RealEstate';
 
 const navItems = [
   { to: '/', label: '대시보드' },
@@ -13,6 +17,10 @@ const navItems = [
   { to: '/cashflow', label: '수입/지출' },
   { to: '/pensions', label: '연금' },
   { to: '/goals', label: '목표' },
+  { to: '/simulation', label: '시뮬레이션' },
+  { to: '/pension-calc', label: '연금추정' },
+  { to: '/tax', label: '세금' },
+  { to: '/realestate', label: '부동산' },
 ];
 
 export default function App() {
@@ -57,6 +65,10 @@ export default function App() {
             <Route path="/cashflow" element={<CashFlow />} />
             <Route path="/pensions" element={<Pensions />} />
             <Route path="/goals" element={<Goals />} />
+            <Route path="/simulation" element={<Simulation />} />
+            <Route path="/pension-calc" element={<PensionCalc />} />
+            <Route path="/tax" element={<TaxCalc />} />
+            <Route path="/realestate" element={<RealEstate />} />
           </Routes>
         </main>
       </div>
