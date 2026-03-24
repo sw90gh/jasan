@@ -180,6 +180,41 @@ class PensionResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+# --- BigExpense ---
+class BigExpenseCreate(BaseModel):
+    name: str
+    category: str
+    amount: float
+    planned_date: date
+    saved_amount: float = 0
+    memo: str | None = None
+
+
+class BigExpenseUpdate(BaseModel):
+    name: str | None = None
+    category: str | None = None
+    amount: float | None = None
+    planned_date: date | None = None
+    saved_amount: float | None = None
+    is_completed: bool | None = None
+    memo: str | None = None
+
+
+class BigExpenseResponse(BaseModel):
+    id: int
+    name: str
+    category: str
+    amount: float
+    planned_date: date
+    saved_amount: float
+    is_completed: bool
+    memo: str | None
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
 # --- Goal ---
 class GoalCreate(BaseModel):
     name: str

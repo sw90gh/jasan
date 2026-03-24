@@ -118,6 +118,22 @@ class Pension(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, onupdate=datetime.now)
 
 
+class BigExpense(Base):
+    """목돈 지출 계획 (미래 예정된 큰 지출)"""
+    __tablename__ = "big_expenses"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    category: Mapped[str] = mapped_column(String(50), nullable=False)  # 의료, 교육, 경조사, 여행, 자동차, 주거, 기타
+    amount: Mapped[float] = mapped_column(Float, nullable=False)
+    planned_date: Mapped[date] = mapped_column(Date, nullable=False)
+    saved_amount: Mapped[float] = mapped_column(Float, default=0)  # 현재까지 준비한 금액
+    is_completed: Mapped[bool] = mapped_column(default=False)
+    memo: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+
 class Goal(Base):
     __tablename__ = "goals"
 

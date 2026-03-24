@@ -10,14 +10,14 @@ import sys
 sys.path.insert(0, ".")
 
 from app.database import engine, Base, SessionLocal
-from app.models import Asset, Debt, Income, Expense, Pension, Goal, AssetHistory
+from app.models import Asset, Debt, Income, Expense, Pension, Goal, AssetHistory, BigExpense
 
 # DB 초기화
 Base.metadata.create_all(bind=engine)
 db = SessionLocal()
 
 # 기존 데이터 삭제
-for model in [Asset, Debt, Income, Expense, Pension, Goal, AssetHistory]:
+for model in [Asset, Debt, Income, Expense, Pension, Goal, AssetHistory, BigExpense]:
     db.query(model).delete()
 db.commit()
 
@@ -160,6 +160,43 @@ goals = [
 db.add_all(goals)
 db.commit()
 print(f"목표 {len(goals)}건 등록 완료")
+
+# === 목돈 지출 계획 ===
+big_expenses = [
+    BigExpense(name="산후조리원", category="의료", amount=5_000_000,
+               planned_date=date(2026, 12, 15), saved_amount=2_000_000,
+               memo="2주 기준, 강남권"),
+    BigExpense(name="자녀1 유치원 입학준비", category="교육", amount=3_000_000,
+               planned_date=date(2027, 2, 20), saved_amount=500_000,
+               memo="원복+가방+교재비+입학금"),
+    BigExpense(name="가족 제주도 여행", category="여행", amount=2_500_000,
+               planned_date=date(2026, 8, 10), saved_amount=1_500_000,
+               memo="4박5일, 렌트카 포함"),
+    BigExpense(name="자동차 보험 (연납)", category="자동차", amount=1_200_000,
+               planned_date=date(2026, 7, 1), saved_amount=0,
+               memo="아반떼 자차포함"),
+    BigExpense(name="종합소득세 납부", category="세금", amount=4_500_000,
+               planned_date=date(2027, 5, 31), saved_amount=0,
+               memo="프리랜서 소득분"),
+    BigExpense(name="에어컨 교체", category="가전", amount=3_500_000,
+               planned_date=date(2026, 5, 15), saved_amount=3_500_000,
+               memo="거실+안방 2대, 이미 준비 완료"),
+    BigExpense(name="친구 결혼식 축의금 (3건)", category="경조사", amount=900_000,
+               planned_date=date(2026, 10, 20), saved_amount=0,
+               memo="각 30만원씩"),
+    BigExpense(name="명절 부모님 용돈+선물", category="경조사", amount=1_000_000,
+               planned_date=date(2026, 9, 25), saved_amount=0,
+               memo="추석"),
+    BigExpense(name="건강검진 (부부)", category="의료", amount=800_000,
+               planned_date=date(2026, 11, 1), saved_amount=0,
+               memo="종합검진 2인"),
+    BigExpense(name="타이어 교체", category="자동차", amount=600_000,
+               planned_date=date(2026, 10, 1), saved_amount=0,
+               memo="4계절 타이어 4본"),
+]
+db.add_all(big_expenses)
+db.commit()
+print(f"목돈 지출 {len(big_expenses)}건 등록 완료")
 
 # === 자산 이력 (12개월) ===
 today = date.today()
