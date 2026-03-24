@@ -4,19 +4,29 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
 import { fetchDashboard, fetchHistory, takeSnapshot, type DashboardSummary, type HistoryRecord } from '../api';
+import api from '../api';
 import { formatKRW, CATEGORY_LABELS, CATEGORY_COLORS } from '../utils';
+
+interface Insight {
+  type: string;
+  icon: string;
+  message: string;
+  detail: string | null;
+}
 
 export default function Dashboard() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [history, setHistory] = useState<HistoryRecord[]>([]);
+  const [insights, setInsights] = useState<Insight[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
     setLoading(true);
     try {
-      const [s, h] = await Promise.all([fetchDashboard(), fetchHistory()]);
+      const [s, h, ins] = await Promise.all([fetchDashboard(), fetchHistory(), api.get('/insights/daily')]);
       setSummary(s.data);
       setHistory(h.data);
+      setInsights(ins.data);
     } catch {
       // API not available yet
     }
@@ -41,6 +51,26 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Insights */}
+      {insights.length > 0 && (
+        <div className="space-y-2">
+          {insights.map((ins, i) => (
+            <div key={i} className={`rounded-lg px-4 py-2.5 text-sm flex items-start gap-2 ${
+              ins.type === 'positive' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+              ins.type === 'warning' ? 'bg-red-50 text-red-700 border border-red-200' :
+              ins.type === 'milestone' ? 'bg-amber-50 text-amber-700 border border-amber-300' :
+              'bg-blue-50 text-blue-700 border border-blue-200'
+            }`}>
+              <span className="font-bold shrink-0">{ins.type === 'positive' ? '✓' : ins.type === 'warning' ? '!' : ins.type === 'milestone' ? '★' : 'i'}</span>
+              <div>
+                <div>{ins.message}</div>
+                {ins.detail && <div className="text-xs opacity-75 mt-0.5">{ins.detail}</div>}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card label="총 자산" value={formatKRW(summary.total_assets)} color="text-blue-600" />

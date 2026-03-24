@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine, Base
-from app.routers import assets, debts, dashboard, incomes, expenses, pensions, goals, history, simulation, pension_calc, tax, realestate, sync, external, advisor, big_expenses, budget, realvalue
+from app.routers import assets, debts, dashboard, incomes, expenses, pensions, goals, history, simulation, pension_calc, tax, realestate, sync, external, advisor, big_expenses, budget, realvalue, insights, tools, calendar_view
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -41,6 +41,9 @@ app.include_router(advisor.router)
 app.include_router(big_expenses.router)
 app.include_router(budget.router)
 app.include_router(realvalue.router)
+app.include_router(insights.router)
+app.include_router(tools.router)
+app.include_router(calendar_view.router)
 
 
 @app.get("/api/health")
