@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
-  Treemap, BarChart, Bar,
+  BarChart, Bar,
 } from 'recharts';
 import { fetchDashboard, fetchHistory, takeSnapshot, type DashboardSummary, type HistoryRecord } from '../api';
 import api from '../api';
@@ -29,16 +29,16 @@ export default function Dashboard() {
   const load = async () => {
     setLoading(true);
     try {
-      const [s, h, ins, tm, db_, gp, ue, eb] = await Promise.all([
-        fetchDashboard(), fetchHistory(), api.get('/insights/daily'),
-        api.get('/dashboard/treemap'), api.get('/dashboard/debt-breakdown'),
-        api.get('/dashboard/goals-progress'), api.get('/dashboard/upcoming-expenses'),
-        api.get('/dashboard/expense-breakdown'),
-      ]);
-      setSummary(s.data); setHistory(h.data); setInsights(ins.data);
-      setTreemap(tm.data); setDebts(db_.data); setGoals(gp.data);
-      setUpcoming(ue.data); setExpenseBreakdown(eb.data);
+      const [s, h] = await Promise.all([fetchDashboard(), fetchHistory()]);
+      setSummary(s.data); setHistory(h.data);
     } catch {}
+    // Load extras independently so one failure doesn't break the page
+    api.get('/insights/daily').then(r => setInsights(r.data)).catch(() => {});
+    api.get('/dashboard/treemap').then(r => setTreemap(r.data)).catch(() => {});
+    api.get('/dashboard/debt-breakdown').then(r => setDebts(r.data)).catch(() => {});
+    api.get('/dashboard/goals-progress').then(r => setGoals(r.data)).catch(() => {});
+    api.get('/dashboard/upcoming-expenses').then(r => setUpcoming(r.data)).catch(() => {});
+    api.get('/dashboard/expense-breakdown').then(r => setExpenseBreakdown(r.data)).catch(() => {});
     setLoading(false);
   };
 
@@ -105,19 +105,42 @@ export default function Dashboard() {
 
       {/* Row 3: Treemap + Pie */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Treemap */}
+        {/* Treemap (CSS-based) */}
         <div className="bg-white rounded-xl shadow p-5">
           <h2 className="text-lg font-semibold mb-3">자산 구성 (트리맵)</h2>
           {treemapFlat.length > 0 ? (
-            <ResponsiveContainer width="100%" height={320}>
-              <Treemap
-                data={treemapFlat}
-                dataKey="size"
-                aspectRatio={4 / 3}
-                stroke="#fff"
-                content={<TreemapContent />}
-              />
-            </ResponsiveContainer>
+            <div className="flex flex-wrap gap-1" style={{ minHeight: 320 }}>
+              {treemapFlat.map((item, i) => {
+                const totalValue = treemapFlat.reduce((s, x) => s + x.size, 0);
+                const pct = (item.size / totalValue) * 100;
+                const minW = Math.max(pct * 2.5, 60);
+                return (
+                  <div key={i} className="rounded-lg p-2 flex flex-col justify-between text-white overflow-hidden cursor-default hover:opacity-90 transition-opacity"
+                    style={{
+                      backgroundColor: item.color,
+                      width: `calc(${Math.max(pct, 5)}% - 4px)`,
+                      minWidth: minW,
+                      minHeight: pct > 15 ? 100 : 60,
+                      flexGrow: pct > 10 ? pct / 10 : 1,
+                    }}
+                    title={`${item.name}: ${formatKRW(item.size)}${item.pnl !== null ? ` (${item.pnl > 0 ? '+' : ''}${item.pnl}%)` : ''}`}
+                  >
+                    <div>
+                      <div className="text-xs font-bold truncate">{item.name}</div>
+                      <div className="text-[10px] opacity-80">{item.category}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold">{formatKRW(item.size)}</div>
+                      {item.pnl !== null && (
+                        <div className={`text-[10px] ${item.pnl >= 0 ? 'text-green-200' : 'text-red-200'}`}>
+                          {item.pnl >= 0 ? '+' : ''}{item.pnl}%
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           ) : (
             <div className="h-[320px] flex items-center justify-center text-slate-400">자산을 등록해주세요</div>
           )}
@@ -349,25 +372,3 @@ function FlowBar({ label, amount, max, color }: { label: string; amount: number;
   );
 }
 
-// Custom Treemap content renderer
-function TreemapContent(props: any) {
-  const { x, y, width, height, name, size, color, pnl } = props;
-  if (width < 30 || height < 20) return null;
-
-  return (
-    <g>
-      <rect x={x} y={y} width={width} height={height} fill={color} stroke="#fff" strokeWidth={2} rx={4} opacity={0.85} />
-      {width > 50 && height > 30 && (
-        <>
-          <text x={x + 6} y={y + 16} fill="#fff" fontSize={width > 100 ? 12 : 10} fontWeight="bold">{name}</text>
-          {height > 45 && <text x={x + 6} y={y + 32} fill="rgba(255,255,255,0.85)" fontSize={10}>{formatKRW(size)}</text>}
-          {height > 58 && pnl !== null && (
-            <text x={x + 6} y={y + 46} fill={pnl >= 0 ? '#bbf7d0' : '#fecaca'} fontSize={10}>
-              {pnl >= 0 ? '+' : ''}{pnl}%
-            </text>
-          )}
-        </>
-      )}
-    </g>
-  );
-}
