@@ -134,6 +134,20 @@ class BigExpense(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, onupdate=datetime.now)
 
 
+class ActualSpending(Base):
+    """월별 실제 지출 기록"""
+    __tablename__ = "actual_spending"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    year_month: Mapped[str] = mapped_column(String(7), nullable=False)  # "2026-03"
+    category: Mapped[str] = mapped_column(String(50), nullable=False)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    amount: Mapped[float] = mapped_column(Float, nullable=False)
+    spend_date: Mapped[date | None] = mapped_column(Date)
+    memo: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+
 class Goal(Base):
     __tablename__ = "goals"
 

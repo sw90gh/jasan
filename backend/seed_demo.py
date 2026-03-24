@@ -10,14 +10,14 @@ import sys
 sys.path.insert(0, ".")
 
 from app.database import engine, Base, SessionLocal
-from app.models import Asset, Debt, Income, Expense, Pension, Goal, AssetHistory, BigExpense
+from app.models import Asset, Debt, Income, Expense, Pension, Goal, AssetHistory, BigExpense, ActualSpending
 
 # DB 초기화
 Base.metadata.create_all(bind=engine)
 db = SessionLocal()
 
 # 기존 데이터 삭제
-for model in [Asset, Debt, Income, Expense, Pension, Goal, AssetHistory, BigExpense]:
+for model in [Asset, Debt, Income, Expense, Pension, Goal, AssetHistory, BigExpense, ActualSpending]:
     db.query(model).delete()
 db.commit()
 
@@ -197,6 +197,33 @@ big_expenses = [
 db.add_all(big_expenses)
 db.commit()
 print(f"목돈 지출 {len(big_expenses)}건 등록 완료")
+
+# === 실제 지출 (이번 달) ===
+today = date.today()
+ym = today.strftime("%Y-%m")
+actual_spending = [
+    ActualSpending(year_month=ym, category="주거", name="주택담보대출 상환", amount=2_200_000, spend_date=date(today.year, today.month, 5)),
+    ActualSpending(year_month=ym, category="주거", name="관리비", amount=230_000, spend_date=date(today.year, today.month, 10)),
+    ActualSpending(year_month=ym, category="대출", name="신용대출 상환", amount=850_000, spend_date=date(today.year, today.month, 5)),
+    ActualSpending(year_month=ym, category="대출", name="자동차 할부", amount=420_000, spend_date=date(today.year, today.month, 15)),
+    ActualSpending(year_month=ym, category="식비", name="마트 장보기", amount=320_000, spend_date=date(today.year, today.month, 8)),
+    ActualSpending(year_month=ym, category="식비", name="외식 (가족)", amount=180_000, spend_date=date(today.year, today.month, 12)),
+    ActualSpending(year_month=ym, category="식비", name="배달음식", amount=95_000, spend_date=date(today.year, today.month, 18)),
+    ActualSpending(year_month=ym, category="교통", name="주유", amount=120_000, spend_date=date(today.year, today.month, 7)),
+    ActualSpending(year_month=ym, category="교통", name="교통카드 충전", amount=50_000, spend_date=date(today.year, today.month, 1)),
+    ActualSpending(year_month=ym, category="통신", name="핸드폰+인터넷", amount=118_000, spend_date=date(today.year, today.month, 20)),
+    ActualSpending(year_month=ym, category="보험", name="보험료 자동이체", amount=250_000, spend_date=date(today.year, today.month, 25)),
+    ActualSpending(year_month=ym, category="교육", name="자녀 학원비", amount=500_000, spend_date=date(today.year, today.month, 1)),
+    ActualSpending(year_month=ym, category="생활", name="다이소+의류", amount=150_000, spend_date=date(today.year, today.month, 14)),
+    ActualSpending(year_month=ym, category="여가", name="넷플릭스+헬스장", amount=85_000, spend_date=date(today.year, today.month, 1)),
+    ActualSpending(year_month=ym, category="여가", name="가족 영화", amount=48_000, spend_date=date(today.year, today.month, 16)),
+    ActualSpending(year_month=ym, category="저축", name="연금저축 납입", amount=500_000, spend_date=date(today.year, today.month, 5)),
+    ActualSpending(year_month=ym, category="저축", name="적금", amount=300_000, spend_date=date(today.year, today.month, 5)),
+    ActualSpending(year_month=ym, category="식비", name="커피/간식", amount=65_000, spend_date=date(today.year, today.month, 22)),
+]
+db.add_all(actual_spending)
+db.commit()
+print(f"실제 지출 {len(actual_spending)}건 등록 완료 ({ym})")
 
 # === 자산 이력 (12개월) ===
 today = date.today()

@@ -12,6 +12,7 @@ import RealEstate from './pages/RealEstate';
 import Sync from './pages/Sync';
 import Advisor from './pages/Advisor';
 import BigExpenses from './pages/BigExpenses';
+import RealValue from './pages/RealValue';
 
 const navItems = [
   { to: '/', label: '대시보드' },
@@ -23,6 +24,7 @@ const navItems = [
   { to: '/goals', label: '목표' },
   { to: '/simulation', label: '시뮬레이션' },
   { to: '/pension-calc', label: '연금추정' },
+  { to: '/realvalue', label: '실질가치' },
   { to: '/tax', label: '세금' },
   { to: '/realestate', label: '부동산' },
   { to: '/advisor', label: '어드바이저' },
@@ -76,6 +78,7 @@ export default function App() {
             <Route path="/tax" element={<TaxCalc />} />
             <Route path="/realestate" element={<RealEstate />} />
             <Route path="/big-expenses" element={<BigExpenses />} />
+            <Route path="/realvalue" element={<RealValue />} />
             <Route path="/advisor" element={<Advisor />} />
             <Route path="/sync" element={<Sync />} />
           </Routes>
